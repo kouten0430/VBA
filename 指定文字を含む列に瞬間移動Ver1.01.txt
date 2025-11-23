@@ -1,0 +1,45 @@
+Sub 指定文字を含む列に瞬間移動()
+    'フィールド名から指定文字を検索します
+    '列方向にのみ移動します
+    '主にフィールド数の多いCSV用です
+    Dim 指定文字 As String
+    Dim 行始 As Long
+    Dim 列始 As Long
+    Dim 列終 As Long
+    Dim i As Integer
+    Dim tmp As Integer
+    
+    If ActiveCell.Address <> ActiveCell.CurrentRegion.Address Then
+        指定文字 = InputBox("指定文字を入力（部分一致）")
+        If 指定文字 = "" Then Exit Sub
+        
+        行始 = ActiveCell.CurrentRegion.Row
+        列始 = ActiveCell.CurrentRegion.Column
+        列終 = ActiveCell.CurrentRegion.Columns(ActiveCell.CurrentRegion.Columns.Count).Column
+    
+        For i = 列始 To 列終
+            If Columns(i).Hidden = True Then GoTo continue '非表示列は処理対象としない
+        
+            If Cells(行始, i).Value Like "*" & 指定文字 & "*" Then
+                ActiveWindow.ScrollColumn = i
+                
+                tmp = MsgBox("この列でよければ「はい」を、" & vbCrLf & "次の列を表示するには「いいえ」を押して下さい。", vbYesNo + vbDefaultButton2)
+                
+                If tmp = vbYes Then  '「はい」を選択した場合はプロシージャを終了する
+                    Exit Sub
+                End If
+                
+            End If
+            
+continue:
+            
+        Next i
+        
+        MsgBox "次の列はありません。"
+        
+    Else
+        MsgBox "カレントリージョンが効く位置で実行して下さい。"
+        
+    End If
+
+End Sub

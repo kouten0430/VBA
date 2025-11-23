@@ -1,0 +1,45 @@
+Sub 指定文字の左側を切り出す()
+    '選択範囲に対して処理を行います
+    Dim 指定文字 As String
+    Dim 境 As Integer
+    Dim tmp As Integer
+    Dim 含 As Integer
+    Dim myRange As Range
+    Dim 始 As Integer
+    Dim i As Integer
+    Dim 位置 As Integer
+    
+    指定文字 = InputBox("指定文字を入力して下さい。")
+        If 指定文字 = "" Then Exit Sub
+        
+    境 = InputBox("左から何個目の指定文字を境にしますか？")
+
+    tmp = MsgBox("指定文字を含んで切り出しますか？", vbYesNoCancel + vbDefaultButton2)
+        If tmp = vbYes Then
+            含 = Len(指定文字)
+        ElseIf tmp = vbNo Then
+            含 = 0
+        Else
+            Exit Sub
+        End If
+
+    For Each myRange In Selection
+        始 = 1  '検索開始位置
+
+        For i = 2 To 境 '左から2個目以降の指定文字を境にした場合の検索開始位置を求める
+            If InStr(始, myRange.Value, 指定文字) > 0 Then
+                始 = InStr(始, myRange.Value, 指定文字) + Len(指定文字)
+            Else
+                Exit For
+            End If
+        Next i
+    
+        位置 = InStr(始, myRange.Value, 指定文字)
+        
+        If 位置 > 0 Then
+            myRange.Value = Left(myRange.Value, 位置 + 含 - 1)
+        End If
+        
+    Next myRange
+    
+End Sub

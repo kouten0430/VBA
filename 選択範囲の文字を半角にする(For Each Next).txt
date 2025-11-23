@@ -1,0 +1,9 @@
+Sub ‘I‘ð”ÍˆÍ‚Ì•¶Žš‚ð”¼Šp‚É‚·‚é()
+    
+    Dim myRange As Range
+
+    For Each myRange In Selection
+        myRange.Value = StrConv(myRange.Value, vbNarrow)
+    Next myRange
+    
+End Sub

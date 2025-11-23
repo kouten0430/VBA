@@ -1,0 +1,20 @@
+Sub n行おきに改ページを入れる()
+    '選択範囲内にn行飛ばしで改ページを入れます
+    '選択範囲の上端と下端に改ページは入りません
+    Dim n As Variant
+    Dim y As Long
+    Dim ye As Long
+    
+    n = Application.InputBox(Prompt:="n行おきに改ページを入れます。" & vbCrLf & "数値を指定して下さい。", Type:=1)
+        If TypeName(n) = "Boolean" Or n < 1 Then
+            Exit Sub
+        End If
+    
+    y = Selection.Row   '選択範囲の最初の行
+    ye = Selection.Rows(Selection.Rows.Count).Row   '選択範囲の最終行
+    
+    For i = y + n To ye Step n
+        ActiveSheet.HPageBreaks.Add (Cells(i, 1))
+    Next i
+    
+End Sub

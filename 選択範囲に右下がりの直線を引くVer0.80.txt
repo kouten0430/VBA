@@ -1,0 +1,14 @@
+Sub 選択範囲に右下がりの直線を引く()
+    Dim x As Long
+    Dim y As Long
+    Dim xe As Long
+    Dim ye As Long
+
+    x = Selection.Left
+    y = Selection.Top
+    xe = Selection.Left + Selection.Width
+    ye = Selection.Top + Selection.Height
+
+    ActiveSheet.Shapes.AddLine x, y, xe, ye
+    
+End Sub

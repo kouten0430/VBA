@@ -1,0 +1,74 @@
+Sub セルの値が異なる箇所に色を塗る()
+    '二つの選択範囲を比較して、セルの値が異なる箇所に任意の色を塗ります（比較側に着色）
+    '選択範囲内での相対的な位置同士で比較します
+    Dim 基準 As Range
+    Dim 比較 As Range
+    Dim tmp As String
+    Dim 色 As Long
+    Dim i As Long
+    Dim j As Long
+    Dim cnt As Long
+
+    On Error Resume Next
+
+    Set 基準 = Application.InputBox(prompt:="基準側を選択（マウスで選択）", Type:=8)
+    
+    If 基準 Is Nothing Then    'キャンセルを押された場合の処理
+        Exit Sub
+    End If
+    
+    Set 比較 = Application.InputBox(prompt:="比較側を選択（マウスで選択）", Type:=8)
+    
+    If 比較 Is Nothing Then    'キャンセルを押された場合の処理
+        Exit Sub
+    End If
+    
+    On Error GoTo 0
+
+    If 基準.Rows.Count <> 比較.Rows.Count Or 基準.Columns.Count <> 比較.Columns.Count Then
+        MsgBox "基準側と比較側の行数または列数が一致していません。"
+        Exit Sub
+    End If
+
+    tmp = InputBox("色を選んで下さい。" & vbCrLf & vbCrLf & _
+    "1:薄い青" & vbCrLf & _
+    "2:薄い緑" & vbCrLf & _
+    "3:薄い黄" & vbCrLf & _
+    "4:薄いピンク" & vbCrLf & _
+    "5:薄い紫" & vbCrLf & _
+    "6:薄い灰" & vbCrLf & _
+    "7:薄いオレンジ")
+    
+    If tmp = "" Then
+        Exit Sub
+    ElseIf tmp = "1" Then
+        色 = 16777164
+    ElseIf tmp = "2" Then
+        色 = 13434828
+    ElseIf tmp = "3" Then
+        色 = 13434879
+    ElseIf tmp = "4" Then
+        色 = 15654399
+    ElseIf tmp = "5" Then
+        色 = 16767468
+    ElseIf tmp = "6" Then
+        色 = 15790320
+    ElseIf tmp = "7" Then
+        色 = 14083324
+    Else
+        MsgBox "指定された数字で入力して下さい。"
+        Exit Sub
+    End If
+
+    For i = 1 To 基準.Rows.Count
+        For j = 1 To 基準.Columns.Count
+            If 基準.Cells(i, j).Value <> 比較.Cells(i, j).Value Then
+                比較.Cells(i, j).Interior.Color = 色
+                cnt = cnt + 1
+            End If
+        Next j
+    Next i
+    
+    MsgBox "セルの値が異なる箇所は " & cnt & " 箇所です。"
+    
+End Sub

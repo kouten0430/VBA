@@ -1,0 +1,27 @@
+Sub 選択中のセルを上または下のセル色と同じにする()
+    Dim tmp As Integer
+    Dim n As Integer
+    Dim myRange As Range
+    
+    tmp = MsgBox("上の色と同じにしますか？（下の場合は、いいえ）", vbYesNoCancel)
+        If tmp = vbYes Then
+            n = -1
+        ElseIf tmp = vbNo Then
+            n = 1
+        Else
+            Exit Sub
+        End If
+    
+    If Selection.Count > 1 Then
+        For Each myRange In Selection.SpecialCells(xlCellTypeVisible)   '可視セルのみに処理を行う
+            If myRange.Address = myRange.MergeArea(1).Address Then   '結合セルの場合は左上の値のみ取り出す
+                myRange.Interior.Color = myRange.Offset(n, 0).Interior.Color
+            End If
+        Next myRange
+        
+    Else
+        ActiveCell.Interior.Color = ActiveCell.Offset(n, 0).Interior.Color
+        
+    End If
+    
+End Sub

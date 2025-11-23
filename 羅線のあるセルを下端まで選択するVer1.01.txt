@@ -1,0 +1,32 @@
+Sub 羅線のあるセルを下端まで選択する()
+    Dim X As Integer
+    Dim Y As Long
+    Dim YE As Long
+    Dim EL As Integer
+    Dim ER As Integer
+    Dim EB As Integer
+    
+    X = ActiveCell.Column   '選択中のセルの列番号を取得する
+    Y = ActiveCell.Row  '選択中のセルの行番号を取得する
+    
+    YE = Y
+
+    EL = Cells(Y, X).Borders(xlEdgeLeft).LineStyle  'セルの左端の罫線の種類を取得する
+    ER = Cells(Y, X).Borders(xlEdgeRight).LineStyle 'セルの右端の罫線の種類を取得する
+    EB = Cells(Y, X).Borders(xlEdgeBottom).LineStyle 'セルの下端の罫線の種類を取得する
+
+    Do While (Not EL = xlLineStyleNone Or Not ER = xlLineStyleNone Or Not EB = xlLineStyleNone) 'セルの右か左か下に罫線がある場合は処理を行う
+    
+        YE = YE + 1 '１行下に進む
+    
+        EL = Cells(YE, X).Borders(xlEdgeLeft).LineStyle
+        ER = Cells(YE, X).Borders(xlEdgeRight).LineStyle
+        EB = Cells(YE, X).Borders(xlEdgeBottom).LineStyle
+
+    Loop
+
+    If Not Y = YE Then  'ループに一度も入らなかった場合、処理を行わない
+        Range(Cells(Y, X), Cells(YE - 1, X)).Select '選択中のセルから下方向に、罫線があるセルをすべて選択する
+    End If
+
+End Sub

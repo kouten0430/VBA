@@ -1,0 +1,7 @@
+Sub 二つ目に選択したセルから値をもってくるコピー版()
+    If Selection.Count = Selection.Areas.Count And Selection.Areas.Count = 2 Then
+        Selection.Areas(1).Value = Selection.Areas(2).Value
+        
+    End If
+    
+End Sub

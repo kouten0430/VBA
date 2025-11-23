@@ -1,0 +1,63 @@
+Sub 一列おきに着色する選択版()
+    '選択範囲の可視列の偶数列に着色します
+    Dim 行始 As Long
+    Dim 行終 As Long
+    Dim 列始 As Long
+    Dim 列終 As Long
+    Dim tmp As String
+    Dim 色 As Long
+    Dim cnt As Long
+    Dim i As Long
+    
+    行始 = Selection.Row
+    行終 = Selection.Rows(Selection.Rows.Count).Row
+    列始 = Selection.Column
+    列終 = Selection.Columns(Selection.Columns.Count).Column
+    
+    tmp = InputBox("色を選んで下さい。" & vbCrLf & vbCrLf & _
+    "1:薄い青" & vbCrLf & _
+    "2:薄い緑" & vbCrLf & _
+    "3:薄い黄" & vbCrLf & _
+    "4:薄いピンク" & vbCrLf & _
+    "5:薄い紫" & vbCrLf & _
+    "6:薄い灰" & vbCrLf & _
+    "7:薄いオレンジ")
+    
+    If tmp = "" Then
+        Exit Sub
+    ElseIf tmp = "1" Then
+        色 = 16777164
+    ElseIf tmp = "2" Then
+        色 = 13434828
+    ElseIf tmp = "3" Then
+        色 = 13434879
+    ElseIf tmp = "4" Then
+        色 = 15654399
+    ElseIf tmp = "5" Then
+        色 = 16767468
+    ElseIf tmp = "6" Then
+        色 = 15790320
+    ElseIf tmp = "7" Then
+        色 = 14083324
+    Else
+        MsgBox "指定された数字で入力して下さい。"
+        Exit Sub
+    End If
+    
+    cnt = 1
+    
+    For i = 列始 To 列終
+        If Columns(i).Hidden = True Then GoTo continue '非表示列は処理対象としない
+        
+        If cnt Mod 2 = 0 Then  '可視列を左から数えて偶数の時のみ処理する
+            Range(Cells(行始, i), Cells(行終, i)).Interior.Color = 色
+            
+        End If
+        
+        cnt = cnt + 1
+        
+continue:
+
+    Next i
+    
+End Sub

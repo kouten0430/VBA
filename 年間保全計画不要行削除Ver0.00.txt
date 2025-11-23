@@ -1,0 +1,14 @@
+Sub 年間保全計画不要行削除()
+    Dim Y As Long
+    
+    Y = ActiveCell.Worksheet.AutoFilter.Range.Rows(ActiveCell. _
+    Worksheet.AutoFilter.Range.Rows.Count).Row
+
+    Do While Y >= 1
+        If Cells(Y, 1).Value = "電気所等(機能場所)" Then
+            Rows(Y).Delete
+        End If
+        
+        Y = Y - 1
+    Loop
+End Sub

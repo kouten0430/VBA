@@ -1,0 +1,37 @@
+Sub 検索に一致したセルのみを選択する()
+    '選択範囲内で指定文字を使って検索を行い、検索に一致したセルのみを再選択します
+    'ワイルドカードを使って部分一致検索にすることもできます
+    'InputBoxが空白なら、空白セルのみを選択します
+    '*　を検索する場合はこの文字を[]で囲みます。
+    Dim myRange As Range
+    Dim myUni As Range
+    Dim sw As String
+    
+    sw = Application.InputBox(prompt:="検索する文字を指定して下さい。" & vbCrLf & "（ワイルドカードは * のみ使用できます）", _
+    Default:="**", Type:=2)
+        If sw = "False" Then
+            Exit Sub
+        End If
+
+    sw = Replace(sw, "[", "[[]")
+    sw = Replace(sw, "［", "[［]")
+    sw = Replace(sw, "＃", "[＃]")
+    sw = Replace(sw, "#", "[#]")
+    sw = Replace(sw, "?", "[?]")
+    sw = Replace(sw, "？", "[？]")
+
+    For Each myRange In Selection.SpecialCells(xlCellTypeVisible)   '可視セルのみに処理を行う
+        If CStr(myRange.Value) Like sw And myRange.Address = myRange.MergeArea(1).Address Then
+            If myUni Is Nothing Then
+                Set myUni = myRange    '検索に一致した一番最初のセル
+            Else
+                Set myUni = Union(myUni, myRange)    '検索に一致した二番目以降のセル
+            End If
+        End If
+    Next myRange
+    
+    If Not myUni Is Nothing Then
+        myUni.Select    '検索に一致したセルをまとめて選択する
+    End If
+
+End Sub

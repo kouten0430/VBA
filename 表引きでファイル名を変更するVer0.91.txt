@@ -1,0 +1,43 @@
+Sub 表引きでファイル名を変更する()
+    Dim Dn As String
+    Dim Tdim As Variant
+    Dim i As Integer
+    Dim Fn As String
+    Dim p As Integer
+    Dim ct As Integer
+    
+    With Application.FileDialog(msoFileDialogFolderPicker)
+        .Title = "リネーム作業を行うフォルダーを選択して下さい"
+        
+        If .Show = -1 Then
+            Dn = .SelectedItems(1)
+        Else
+            Exit Sub
+        End If
+    
+    End With
+    
+    Tdim = Application.InputBox(prompt:="左列の文字でファイル名を検索し、一致したファイルには、" & vbCrLf & _
+    "右列の文字をファイル名に挿入します。" & vbCrLf & "（検索は部分一致で行われます）", Title:="矩形範囲を選択して下さい", _
+    Type:=8) '選択された範囲を二次元配列に格納する
+        If TypeName(Tdim) = "Boolean" Then  'キャンセルを押された場合の処理
+            Exit Sub
+        End If
+
+    For i = 1 To UBound(Tdim)   '二次元配列の一次元の最大値までループ
+        If Not IsEmpty(Tdim(i, 1)) Then
+            Fn = Dir(Dn & "\*" & Tdim(i, 1) & "*")    'フォルダー内を部分一致条件で検索し、一致したファイル名を取得（なければ空白が返る）
+        
+            Do Until Fn = ""    'ファイル名が空白になるまでループ
+                p = InStrRev(Fn, ".")  '.を後方から検索して最初に見つかった文字位置（先頭からの文字数）を返す
+                Name Dn & "\" & Fn As Dn & "\" & Application.WorksheetFunction.Replace(Fn, p, 0, Tdim(i, 2))  '元のファイル名と拡張子の間に、二列目の値を挿入する
+                ct = ct + 1
+                Fn = Dir()  '検索一致が複数あった場合の、二つ目以降のファイル名を取得（なければ空白が返る）
+            Loop
+        End If
+        
+    Next i
+    
+    MsgBox "処理成功：" & ct & " ファイル"
+
+End Sub

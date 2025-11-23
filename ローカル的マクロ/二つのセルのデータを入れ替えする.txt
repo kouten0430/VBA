@@ -1,0 +1,29 @@
+Sub 二つのセルのデータを入れ替えする()
+    'ローカル的なマクロです
+    Dim i As Integer
+    Dim myRange As Range
+    Dim 配列(1) As String
+    
+    If Selection.Count <> 2 Or Selection.MergeCells Then Exit Sub
+
+    i = 0
+        
+    For Each myRange In Selection
+        配列(i) = myRange.Value
+        i = i + 1
+        
+        If i > 1 Then Exit For
+        
+    Next myRange
+    
+    i = 1
+        
+    For Each myRange In Selection
+        myRange.Value = 配列(i)
+        i = i - 1
+        
+        If i < 0 Then Exit For
+        
+    Next myRange
+    
+End Sub

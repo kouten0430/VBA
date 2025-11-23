@@ -1,0 +1,90 @@
+Sub 複数列を対象に絞り込みを行う()
+    '選択範囲の中で，完全一致または部分一致しているセルがある行以外を非表示にします。
+    Dim 指定文字 As String
+    Dim 指定文字弐 As String
+    Dim 指定文字参 As String
+    Dim 指定文字四 As String
+    Dim 指定文字伍 As String
+    Dim tmp As Integer
+    Dim 引数 As Integer
+    Dim 行始 As Long
+    Dim 行終 As Long
+    Dim 列始 As Long
+    Dim 列終 As Long
+    Dim i As Long
+    Dim 有無 As Range
+    Dim myRange As Range
+    Dim cnt As Long
+    
+    指定文字 = InputBox("指定文字を入力して下さい。")
+    If 指定文字 = "" Then Exit Sub
+    
+    指定文字弐 = InputBox("二つ目の指定文字を入力して下さい。" & vbCrLf & "（不要ならキャンセル）")
+    
+    If 指定文字弐 <> "" Then 指定文字参 = InputBox("三つ目の指定文字を入力して下さい。" & vbCrLf & "（不要ならキャンセル）")
+    
+    If 指定文字参 <> "" Then 指定文字四 = InputBox("四つ目の指定文字を入力して下さい。" & vbCrLf & "（不要ならキャンセル）")
+    
+    If 指定文字四 <> "" Then 指定文字伍 = InputBox("五つ目の指定文字を入力して下さい。" & vbCrLf & "（不要ならキャンセル）")
+    
+    tmp = MsgBox("完全一致なら「はい」，部分一致なら「いいえ」" & vbCrLf & "を押して下さい。", vbYesNoCancel)
+    If tmp = vbYes Then
+        引数 = xlWhole
+    ElseIf tmp = vbNo Then
+        引数 = xlPart
+    Else
+        Exit Sub
+    End If
+
+    行始 = Selection.Row
+    行終 = Selection.Rows(Selection.Rows.Count).Row
+    列始 = Selection.Column
+    列終 = Selection.Columns(Selection.Columns.Count).Column
+    
+    Application.ScreenUpdating = False  '画面表示の更新をオフにする
+
+    For i = 行始 To 行終
+        If Rows(i).Hidden = True Then GoTo continue '非表示行は処理対象としない
+        
+        Set 有無 = Range(Cells(i, 列始), Cells(i, 列終)).Find(指定文字, LookAt:=引数)
+        
+        If 指定文字弐 <> "" And 有無 Is Nothing Then
+            Set 有無 = Range(Cells(i, 列始), Cells(i, 列終)).Find(指定文字弐, LookAt:=引数)
+        End If
+        
+        If 指定文字参 <> "" And 有無 Is Nothing Then
+            Set 有無 = Range(Cells(i, 列始), Cells(i, 列終)).Find(指定文字参, LookAt:=引数)
+        End If
+        
+        If 指定文字四 <> "" And 有無 Is Nothing Then
+            Set 有無 = Range(Cells(i, 列始), Cells(i, 列終)).Find(指定文字四, LookAt:=引数)
+        End If
+        
+        If 指定文字伍 <> "" And 有無 Is Nothing Then
+            Set 有無 = Range(Cells(i, 列始), Cells(i, 列終)).Find(指定文字伍, LookAt:=引数)
+        End If
+        
+        If 有無 Is Nothing Then
+            If myRange Is Nothing Then
+                Set myRange = Cells(i, 列始)    '条件に一致しなかった一番最初のRange
+            Else
+                Set myRange = Union(myRange, Cells(i, 列始))    '条件に一致しなかったRange
+            End If
+            
+            cnt = cnt + 1
+            
+        End If
+        
+continue:
+
+    Next i
+        
+    If Not myRange Is Nothing Then
+        myRange.EntireRow.Hidden = True '条件に一致しなかった行をすべて非表示にする
+    End If
+    
+    Application.ScreenUpdating = True  '画面表示の更新をオンにする
+    
+    MsgBox cnt & " 件非表示にしました。"
+    
+End Sub

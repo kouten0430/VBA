@@ -1,0 +1,173 @@
+Sub 次回取替年度生成()
+    Dim 行始 As Long
+    Dim 行終 As Long
+    Dim 列始 As Long
+    Dim 列終 As Long
+    Dim テキスト As Long
+    Dim 設置形態 As Long
+    Dim 投入 As Long
+    Dim 開放 As Long
+    Dim 型式 As Long
+    Dim 設備運開日 As Long
+    Dim 製造者 As Long
+    Dim 製造年 As Long
+    Dim 仮整流器種別 As Range
+    Dim 整流器種別 As Long
+    Dim 仮機能場所 As Range
+    Dim 機能場所 As Long
+    Dim 仮用途 As Range
+    Dim 用途 As Long
+    Dim 仮構造 As Range
+    Dim 構造 As Long
+    
+    '---ここから行番号・列番号を取得する処理---
+    
+    行始 = ActiveCell.CurrentRegion.Row
+    行終 = ActiveCell.CurrentRegion.Rows(ActiveCell.CurrentRegion.Rows.Count).Row
+    列始 = ActiveCell.CurrentRegion.Column
+    列終 = ActiveCell.CurrentRegion.Columns(ActiveCell.CurrentRegion.Columns.Count).Column
+    
+    For i = 列始 To 列終
+        If Cells(行始, i).Value = "テキスト" Then
+            テキスト = i
+        ElseIf Cells(行始, i).Value = "設置形態" Then
+            設置形態 = i
+        ElseIf Cells(行始, i).Value = "操作方式（投入）" Then
+            投入 = i
+        ElseIf Cells(行始, i).Value = "操作方式（開放）" Then
+            開放 = i
+        ElseIf Cells(行始, i).Value Like "型式(漢字かな全角*" Then
+            型式 = i
+        ElseIf Cells(行始, i).Value = "設備運開日" Then
+            設備運開日 = i
+        ElseIf Cells(行始, i).Value Like "製造者コード*" Then
+            製造者 = i
+        ElseIf Cells(行始, i).Value = "製造年月日" Then
+            製造年 = i
+        End If
+    Next i
+    
+    Set 仮整流器種別 = ActiveCell.CurrentRegion.Find("サイリスタ", LookAt:=xlPart)
+        If Not 仮整流器種別 Is Nothing Then
+              整流器種別 = 仮整流器種別.Column
+        End If
+    
+    Set 仮機能場所 = ActiveCell.CurrentRegion.Find("ＴＣ前", LookAt:=xlPart)    'この列は自前で用意する必要あり
+        If Not 仮機能場所 Is Nothing Then
+              機能場所 = 仮機能場所.Column
+        End If
+        
+    Set 仮用途 = ActiveCell.CurrentRegion.Find("送電線用", LookAt:=xlWhole)
+        If Not 仮用途 Is Nothing Then
+              用途 = 仮用途.Column
+        End If
+        
+    Set 仮構造 = ActiveCell.CurrentRegion.Find("真空", LookAt:=xlWhole)
+        If Not 仮構造 Is Nothing Then
+              構造 = 仮構造.Column
+        End If
+        
+    If テキスト = 0 Then テキスト = 9999
+    If 設置形態 = 0 Then 設置形態 = 9999
+    If 投入 = 0 Then 投入 = 9999
+    If 開放 = 0 Then 開放 = 9999
+    If 型式 = 0 Then 型式 = 9999
+    If 設備運開日 = 0 Then 設備運開日 = 9999
+    If 整流器種別 = 0 Then 整流器種別 = 9999
+    If 機能場所 = 0 Then 機能場所 = 9999
+    If 用途 = 0 Then 用途 = 9999
+    If 構造 = 0 Then 構造 = 9999
+    If 製造者 = 0 Then 製造者 = 9999
+    If 製造年 = 0 Then 製造年 = 9999
+    
+    '---ここから取替基準を生成する処理---
+    
+    Cells(行始, 列終 + 1).Value = "取替基準"
+    
+    For i = 行始 + 1 To 行終
+        If Cells(i, テキスト).Value = "主要変圧器" And Cells(i, 製造者).Value = "180" Then
+            If Cells(i, 製造年).Value <> "" Then
+                If Year(Cells(i, 製造年).Value) >= 1982 And Year(Cells(i, 製造年).Value) <= 2002 Then
+                    Cells(i, 列終 + 1).Value = 50
+                Else
+                    Cells(i, 列終 + 1).Value = 60
+                End If
+            Else
+                Cells(i, 列終 + 1).Value = 60
+            End If
+        ElseIf Cells(i, テキスト).Value = "主要変圧器" Then
+            Cells(i, 列終 + 1).Value = 60
+        ElseIf Cells(i, テキスト).Value = "所内用変圧器" Then
+            Cells(i, 列終 + 1).Value = 60
+        ElseIf Cells(i, テキスト).Value = "接地変圧器" Then
+            Cells(i, 列終 + 1).Value = 60
+        ElseIf Cells(i, テキスト).Value = "変換用変圧器" Then
+            Cells(i, 列終 + 1).Value = 60
+        ElseIf Cells(i, テキスト).Value = "計器用変圧器" Then
+            Cells(i, 列終 + 1).Value = 50
+        ElseIf Cells(i, テキスト).Value = "避雷器" And Cells(i, 製造者).Value = "197" And Cells(i, 型式).Value Like "ZS-A*" Then
+            Cells(i, 列終 + 1).Value = 40
+        ElseIf Cells(i, テキスト).Value = "避雷器" Then
+            Cells(i, 列終 + 1).Value = 50
+        ElseIf Cells(i, テキスト).Value = "蓄電池" Then
+            Cells(i, 列終 + 1).Value = 25
+        ElseIf Cells(i, テキスト).Value = "空気圧縮機" Then
+            Cells(i, 列終 + 1).Value = 20
+        ElseIf Cells(i, テキスト).Value = "キュービクル" Then
+            Cells(i, 列終 + 1).Value = 40
+        ElseIf Cells(i, テキスト).Value Like "遠*" Then
+            Cells(i, 列終 + 1).Value = 25
+        ElseIf Cells(i, テキスト).Value = "配電盤" And Cells(i, 用途).Value = "所内用" Then
+            Cells(i, 列終 + 1).Value = ""
+        ElseIf Cells(i, テキスト).Value = "配電盤" And Cells(i, 用途).Value = "変圧器用" Then
+            Cells(i, 列終 + 1).Value = 25
+        ElseIf Cells(i, テキスト).Value = "配電盤" And Cells(i, 用途).Value = "ＳＨＲ用" Then
+            Cells(i, 列終 + 1).Value = 35
+        ElseIf Cells(i, テキスト).Value = "配電盤" And Cells(i, 用途).Value = "リアクトル用" Then
+            Cells(i, 列終 + 1).Value = 35
+        ElseIf Cells(i, テキスト).Value = "配電盤" And Cells(i, 用途).Value = "ＳＣ用" Then
+            Cells(i, 列終 + 1).Value = ""
+        ElseIf Cells(i, テキスト).Value = "配電盤" And Cells(i, 機能場所).Value Like "*ＴＣ前*" Then
+            Cells(i, 列終 + 1).Value = 25
+        ElseIf Cells(i, テキスト).Value = "配電盤" And Not Cells(i, 機能場所).Value Like "*ＴＣ前*" And Not Cells(i, 用途).Value = "ＳＣ用" And Not Cells(i, 用途).Value = "リアクトル用" And Not Cells(i, 用途).Value = "ＳＨＲ用" And Not Cells(i, 用途).Value = "変圧器用" And Not Cells(i, 用途).Value = "所内用" Then
+            Cells(i, 列終 + 1).Value = 30
+        ElseIf Cells(i, テキスト).Value = "遮断器" And Cells(i, 構造).Value = "油入" And (Cells(i, 投入).Value = "空気" Or Cells(i, 開放).Value = "空気") And Not Cells(i, 型式).Value Like "ECO*" Then
+            Cells(i, 列終 + 1).Value = 30
+        ElseIf Cells(i, テキスト).Value = "遮断器" And Cells(i, 構造).Value = "油入" And (Cells(i, 投入).Value = "空気" Or Cells(i, 開放).Value = "空気") And Cells(i, 型式).Value Like "ECO*" Then
+            Cells(i, 列終 + 1).Value = 30
+        ElseIf Cells(i, テキスト).Value = "遮断器" And Cells(i, 構造).Value = "油入" And Not (Cells(i, 投入).Value = "空気" Or Cells(i, 開放).Value = "空気") And Cells(i, 型式).Value Like "ECO*" Then
+            Cells(i, 列終 + 1).Value = 55
+        ElseIf Cells(i, テキスト).Value = "遮断器" And Cells(i, 構造).Value = "ガス" Then
+            Cells(i, 列終 + 1).Value = 48
+        ElseIf Cells(i, テキスト).Value = "遮断器" And Cells(i, 構造).Value = "真空" And Cells(i, 設置形態).Value = "単独" Then
+            Cells(i, 列終 + 1).Value = 48
+        ElseIf Cells(i, テキスト).Value = "遮断器" And Cells(i, 構造).Value = "真空" And Cells(i, 設置形態).Value = "ＥＶＣＢ内蔵" Then
+            Cells(i, 列終 + 1).Value = 48
+        ElseIf Cells(i, テキスト).Value = "遮断器" And Cells(i, 構造).Value = "真空" And Cells(i, 設置形態).Value = "キュービクル内蔵" And Cells(i, 型式).Value Like "VBCD*" Then
+            Cells(i, 列終 + 1).Value = 50
+        ElseIf Cells(i, テキスト).Value = "遮断器" And Cells(i, 構造).Value = "真空" And Cells(i, 設置形態).Value = "キュービクル内蔵" And Not Cells(i, 型式).Value Like "VBCD*" Then
+            Cells(i, 列終 + 1).Value = 40
+        ElseIf Cells(i, 整流器種別).Value Like "サイリスタ*" Then
+            Cells(i, 列終 + 1).Value = 26
+        ElseIf Cells(i, 整流器種別).Value = "シリコン" Then
+            Cells(i, 列終 + 1).Value = 21
+        ElseIf Cells(i, テキスト).Value = "電力ケーブル" And Cells(i, 用途).Value = "移動用" Then
+            Cells(i, 列終 + 1).Value = 50
+        End If
+    Next i
+    
+    '---ここから次回取替年度を生成する処理---
+    
+    Cells(行始, 列終 + 2).Value = "次回取替"
+    
+    For i = 行始 + 1 To 行終
+        If Cells(i, 列終 + 1).Value <> "" And Cells(i, 設備運開日).Value <> "" Then
+            If Month(Cells(i, 設備運開日).Value) < 4 Then
+                Cells(i, 列終 + 2).Value = Year(Cells(i, 設備運開日).Value) - 1 + Cells(i, 列終 + 1).Value
+            Else
+                Cells(i, 列終 + 2).Value = Year(Cells(i, 設備運開日).Value) + Cells(i, 列終 + 1).Value
+            End If
+        End If
+    Next i
+    
+End Sub

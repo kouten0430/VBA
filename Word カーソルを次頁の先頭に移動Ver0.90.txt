@@ -1,0 +1,8 @@
+Sub カーソルを次頁の先頭に移動()
+    Dim 現在頁 As Integer
+    
+    現在頁 = Selection.Information(wdActiveEndPageNumber)
+    
+    Selection.GoTo What:=wdGoToPage, Count:=現在頁 + 1, Which:=wdGoToFirst
+    
+End Sub

@@ -1,0 +1,62 @@
+Sub 同じデータのセルを結合する()
+    Dim 列 As Long
+    Dim 行 As Long
+    Dim 行終 As Long
+    Dim 列終 As Long
+    Dim myUni As Range
+
+    Application.DisplayAlerts = False
+
+    If Selection.Rows.Count > 1 And Selection.Columns.Count = 1 Then    '下方向に選択したときの処理
+        列 = Selection.Column
+        行 = Selection.Row + 1
+        行終 = Selection.Rows(Selection.Rows.Count).Row
+        
+        Do While 行 <= 行終
+            If Cells(行 - 1, 列).Value = Cells(行, 列).Value Then
+                If myUni Is Nothing Then
+                    Set myUni = Range(Cells(行 - 1, 列), Cells(行, 列))
+                Else
+                    Set myUni = Union(myUni, Cells(行, 列))
+                End If
+            Else
+                If Not myUni Is Nothing Then
+                    myUni.Merge
+                    Set myUni = Nothing
+                End If
+            End If
+            
+            行 = 行 + 1
+
+        Loop
+            
+    ElseIf Selection.Rows.Count = 1 And Selection.Columns.Count > 1 Then '右方向に選択したときの処理
+        行 = Selection.Row
+        列 = Selection.Column + 1
+        列終 = Selection.Columns(Selection.Columns.Count).Column
+        
+        Do While 列 <= 列終
+            If Cells(行, 列 - 1).Value = Cells(行, 列).Value Then
+                If myUni Is Nothing Then
+                    Set myUni = Range(Cells(行, 列 - 1), Cells(行, 列))
+                Else
+                    Set myUni = Union(myUni, Cells(行, 列))
+                End If
+            Else
+                If Not myUni Is Nothing Then
+                    myUni.Merge
+                    Set myUni = Nothing
+                End If
+            End If
+            
+            列 = 列 + 1
+
+        Loop
+        
+    End If
+    
+    If Not myUni Is Nothing Then    '行終または列終を含むセルの結合
+        myUni.Merge
+    End If
+
+End Sub

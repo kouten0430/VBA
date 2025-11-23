@@ -1,0 +1,34 @@
+Sub 背景色を含めてデータを入れ替えする()
+    'ローカル的なマクロです
+    Dim i As Integer
+    Dim myRange As Range
+    Dim 値(1) As String
+    Dim 色(1) As Long
+    
+    If Selection.Count <> 2 Or Selection.MergeCells Then Exit Sub
+
+    i = 0
+        
+    For Each myRange In Selection
+        値(i) = myRange.Value
+        
+        If myRange.Interior.ColorIndex = xlNone Then    '塗りつぶしなしの判定はColorIndexプロパティでのみ可能
+            色(i) = xlNone  '塗りつぶしなしの定数
+        Else
+            色(i) = myRange.Interior.Color
+        End If
+        
+        i = i + 1
+        
+    Next myRange
+    
+    i = 1
+        
+    For Each myRange In Selection
+        myRange.Value = 値(i)
+        myRange.Interior.Color = 色(i)
+        i = i - 1
+        
+    Next myRange
+    
+End Sub

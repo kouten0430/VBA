@@ -1,0 +1,57 @@
+Sub 三つ以上の部分一致条件で絞込みを行う()
+    'クリップボードの文字列を参照し、OR条件で絞込みします
+    '現在選択している列を検索し、一致しない行を非表示にします（オートフィルターを使いません）
+    'ワイルドカードがあれば、部分一致で絞込みします
+    Dim V As Variant
+    Dim i As Integer
+    Dim X As Integer
+    Dim Y As Long
+    Dim Yn As Long
+    Dim myRange As Range
+    Dim myLib As Object
+    Set myLib = CreateObject("new:{1C3B4210-F441-11CE-B9EA-00AA006B1A69}")  '参照設定なしでDataObjectのインスタンスを生成する
+    
+    Application.ScreenUpdating = False  '画面表示の更新をオフにする
+    
+    myLib.GetFromClipboard
+        On Error Resume Next
+    V = myLib.GetText
+        On Error GoTo 0
+        
+    If Not IsEmpty(V) Then
+        V = Split(CStr(V), vbCrLf)
+        X = ActiveCell.Column
+        
+        For Y = ActiveCell.CurrentRegion.Row To ActiveCell.CurrentRegion. _
+        Rows(ActiveCell.CurrentRegion.Rows.Count).Row
+            i = 0
+        
+            Do While i <= UBound(V)
+                If Cells(Y, X).Value Like V(i) Then '配列の内容と一致している場合は行を進める
+                        Yn = Y + 1
+                        Do While Cells(Y, X).Address = Cells(Yn, X).MergeArea(1).Address    '結合セルを抜けるまで行を進める
+                            Yn = Yn + 1
+                        Loop
+                        Y = Yn - 1
+                    
+                    GoTo nx
+                Else
+                    i = i + 1
+                End If
+            Loop
+            
+            If myRange Is Nothing Then
+                Set myRange = Range(Y & ":" & Y)    '配列の内容全てと一致しなかった一番最初の行
+            Else
+                Set myRange = Union(myRange, Range(Y & ":" & Y))    '配列の内容全てと一致しなかった行
+            End If
+             
+nx:
+        Next Y
+        
+        myRange.EntireRow.Hidden = True '検索に一致しなかった行をすべて非表示にする
+    Else
+        MsgBox "クリップボードにデータがありません！"
+    End If
+
+End Sub

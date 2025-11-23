@@ -1,0 +1,76 @@
+Sub 保全計画と設備停止計画のチェック()
+
+    検索元ワークブック名 = ActiveWorkbook.Name
+    検索先ワークブック名 = "9月（決定）.xlsx"
+    電気所等名称列 = 2
+    保全計画テキスト列 = 6
+
+    行始 = ActiveCell.CurrentRegion.Row
+    行終 = ActiveCell.CurrentRegion.Rows(ActiveCell.CurrentRegion.Rows.Count).Row
+    列始 = ActiveCell.CurrentRegion.Column
+    列終 = ActiveCell.CurrentRegion.Columns(ActiveCell.CurrentRegion.Columns.Count).Column
+    年停行始 = Workbooks(検索先ワークブック名).Sheets(1).Range("E5").CurrentRegion.Row  'Rangeの引数はお好みで
+    年停行終 = Workbooks(検索先ワークブック名).Sheets(1).Range("E5").CurrentRegion.Rows(Workbooks(検索先ワークブック名).Sheets(1).Range("E5").CurrentRegion.Rows.Count).Row 'Rangeの引数はお好みで
+    作業内容列 = Workbooks(検索先ワークブック名).Sheets(1).Range("A1:FK1").Find("作業内容", LookAt:=xlWhole).Column
+    要求時注釈列 = Workbooks(検索先ワークブック名).Sheets(1).Range("A1:FK1").Find("要求時注釈", LookAt:=xlWhole).Column
+    実施箇所列 = Workbooks(検索先ワークブック名).Sheets(1).Range("A1:FK1").Find("実施箇所", LookAt:=xlWhole).Column
+    
+    For i = 行始 To 行終
+    
+        If Rows(i).Hidden = False Then  '可視セルのみ処理を行う
+
+            電気所等名称 = Left(Cells(i, 電気所等名称列).Value, InStr(Cells(i, 電気所等名称列).Value, "　") - 1)    '左端から電気所名のみを切り出す
+            If Right(電気所等名称, 1) = "開" Then
+                電気所等名称 = 電気所等名称 & "閉所"
+            Else
+                電気所等名称 = 電気所等名称 & "電所"
+            End If
+            
+            保全計画テキスト = StrConv(Cells(i, 保全計画テキスト列).Value, vbWide)    '全角にする
+            保全計画テキスト = StrConv(保全計画テキスト, vbUpperCase) '大文字にする
+    
+            If 保全計画テキスト Like "*" & "ＬＳ" & "*" Then
+    
+                切始 = InStr(保全計画テキスト, "ＬＳ")
+    
+                For j = 切始 To Len(保全計画テキスト)
+                    If Mid(保全計画テキスト, j, 1) Like "[!０-９Ａ-Ｚ－]" Then
+                        切出し文字 = Mid(保全計画テキスト, 切始, j - 切始)
+                        Exit For
+            
+                    End If
+                Next j
+
+                For k = 年停行始 To 年停行終
+                
+                    If Workbooks(検索先ワークブック名).Sheets(1).Rows(k).Hidden = False Then  '可視セルのみ処理を行う
+                
+                        作業内容 = StrConv(Workbooks(検索先ワークブック名).Sheets(1).Cells(k, 作業内容列).Value, vbWide)  '全角にする
+                        作業内容 = StrConv(作業内容, vbUpperCase) '大文字にする
+                        実施個所 = Workbooks(検索先ワークブック名).Sheets(1).Cells(k, 実施箇所列).Value
+                
+                        If 実施個所 = 電気所等名称 And 作業内容 Like "*" & 切出し文字 & "*" Then    '実施個所と作業内容が一致していれば色を付ける
+                            Workbooks(検索先ワークブック名).Sheets(1).Cells(k, 作業内容列).Interior.Color = 65535
+                            Cells(i, 保全計画テキスト列).Interior.Color = 65535
+                            Exit For
+                        
+                        End If
+                    
+                    End If
+                    
+                    DoEvents
+                
+                Next k
+
+            End If
+
+        End If
+        
+        進捗 = i / 行終
+        Application.StatusBar = "処理実行中．．．" & Round(進捗 * 100, 0) & "%"
+        
+    Next i
+    
+    Application.StatusBar = False
+    
+End Sub

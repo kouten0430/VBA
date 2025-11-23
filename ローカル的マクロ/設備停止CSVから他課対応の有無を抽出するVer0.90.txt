@@ -1,0 +1,67 @@
+Sub 設備停止CSVから他課対応の有無を抽出する()
+    '22kV線路停止かつ給電接地有り、または注釈欄に変電保守課の文字が含まれる件名が該当
+    '該当する件名があればA列のセルに着色します
+    '最後にオートフィルターで着色箇所を絞り込みします
+    'ローカル的なマクロです
+    Dim 列要求 As Long
+    Dim 列一 As Long
+    Dim 列二 As Long
+    Dim 列三 As Long
+    Dim 列四 As Long
+    Dim 列五 As Long
+    Dim 列六 As Long
+    Dim 列七 As Long
+    Dim 列八 As Long
+    Dim 列九 As Long
+    Dim 列注釈 As Long
+    Dim 列接地 As Long
+    Dim 行始 As Long
+    Dim 行終 As Long
+    Dim 検索単語 As Variant
+    Dim i As Long
+    Dim j As Long
+    
+    列要求 = Cells.Find("要求箇所", LookAt:=xlWhole).Column
+    列一 = Cells.Find("停止設備および線路名　停止設備１", LookAt:=xlWhole).Column
+    列二 = Cells.Find("停止設備および線路名　停止設備２", LookAt:=xlWhole).Column
+    列三 = Cells.Find("停止設備および線路名　停止設備３", LookAt:=xlWhole).Column
+    列四 = Cells.Find("停止設備および線路名　停止設備４", LookAt:=xlWhole).Column
+    列五 = Cells.Find("停止設備および線路名　停止設備５", LookAt:=xlWhole).Column
+    列六 = Cells.Find("停止設備および線路名　停止設備６", LookAt:=xlWhole).Column
+    列七 = Cells.Find("停止設備および線路名　停止設備７", LookAt:=xlWhole).Column
+    列八 = Cells.Find("停止設備および線路名　停止設備８", LookAt:=xlWhole).Column
+    列九 = Cells.Find("停止設備および線路名　停止設備９", LookAt:=xlWhole).Column
+    列注釈 = Cells.Find("要求時注釈", LookAt:=xlWhole).Column
+    列接地 = Cells.Find("給電接地　接地有無", LookAt:=xlWhole).Column
+    
+    行始 = Cells.Find("要求箇所", LookAt:=xlWhole).Row
+    行終 = Cells(Rows.Count, 列要求).End(xlUp).Row
+    
+    検索単語 = Array("富山化学北線", "富山化学南線", "地鉄稲荷線", "三菱ケミカル線", "東ソー線", "大平洋ランダム線", "水橋開発太陽光線", "立山製紙線", "上市川線", "不二越富山線1L", "不二越富山線2L", "第１婦中南線", "第２婦中南線", "婦中北線") '必要に応じて変更する
+    
+    For i = 行始 To 行終
+        If Cells(i, 列要求) Like "富[変電]保守" Then GoTo continue  '自課件名は処理をパスする
+        
+        j = 0
+    
+        Do While j <= UBound(検索単語)
+            If ((Cells(i, 列一) = 検索単語(j) Or Cells(i, 列二) = 検索単語(j) Or Cells(i, 列三) = 検索単語(j) Or Cells(i, 列四) = 検索単語(j) Or Cells(i, 列五) = 検索単語(j) Or Cells(i, 列六) = 検索単語(j) Or Cells(i, 列七) = 検索単語(j) Or Cells(i, 列八) = 検索単語(j) Or Cells(i, 列九) = 検索単語(j)) And Cells(i, 列接地) = "1") Or Cells(i, 列注釈) Like "*変電保守課*" Then
+                Cells(i, "A").Interior.Color = 14277081
+                Exit Do   '残りの検索をスキップ
+                
+            Else
+                j = j + 1
+            End If
+        Loop
+        
+continue:
+        
+    Next i
+    
+    Cells(行始, "A").AutoFilter Field:=1  '当該セルを含むアクティブセル領域をオートフィルターに設定する。引数は既にオートフィルターがある場合に解除しないためのダミー
+    
+    If ActiveSheet.FilterMode = True Then ActiveSheet.ShowAllData   'オートフィルターによる絞り込みがあれば一旦すべてクリアする
+    
+    Cells(行始, "A").AutoFilter Field:=1, Criteria1:=14277081, Operator:=xlFilterCellColor    'セルの背景色で絞り込みを行う
+    
+End Sub

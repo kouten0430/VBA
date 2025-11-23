@@ -1,0 +1,27 @@
+Sub 指定した文字の色を変える()
+    Dim r As Range
+
+r:
+    sm = Application.InputBox(Prompt:="色を変える文字を指定して下さい", Type:=2)
+        If TypeName(sm) = "Boolean" Then
+            Exit Sub
+        ElseIf sm = "" Then
+            GoTo r
+        End If
+    
+    ci = Application.InputBox(Prompt:="色を選んで下さい", Type:=1)
+        If TypeName(ci) = "Boolean" Then
+            Exit Sub
+        End If
+
+    For Each r In Selection.SpecialCells(xlCellTypeVisible)
+        For i = 1 To Len(r)
+            If InStr(i, r, sm) > 0 Then
+                r.Characters(InStr(i, r, sm), Len(sm)) _
+                .Font.ColorIndex = ci
+            
+                i = InStr(i, r, sm) + Len(sm) - 1
+            End If
+        Next i
+    Next r
+End Sub

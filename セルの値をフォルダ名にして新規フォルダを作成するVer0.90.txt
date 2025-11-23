@@ -1,0 +1,31 @@
+Sub セルの値をフォルダ名にして新規フォルダを作成する()
+    Dim Bcdrive As String
+    Dim Bcdir As String
+    Dim Tdim As Variant
+    Dim a As Variant
+    
+    Bcdrive = Left(CurDir, InStr(CurDir, ":") - 1)  '現在のカレントドライブを記憶
+    Bcdir = CurDir  '現在のカレントディレクトリを記憶
+    
+    ChDrive Left(ActiveWorkbook.Path, InStr(ActiveWorkbook.Path, ":") - 1)    'カレントドライブを一時的に変更
+    ChDir ActiveWorkbook.Path 'カレントディレクトリを一時的に変更
+    
+    Tdim = Application.InputBox(prompt:="フォルダ名に設定する値が入ったセルを選択して下さい。", Type:=8)    '選択された範囲を二次元配列に格納する
+        If TypeName(Tdim) = "Boolean" Then  'キャンセルを押された場合の処理
+            ChDrive Bcdrive
+            ChDir Bcdir
+            Exit Sub
+        End If
+
+    For Each a In Tdim  '二次元配列の中身を順次格納する
+        If Not IsEmpty(a) Then 'バリアント型の変数aがEmpty値ではない場合のみ処理を行う
+            If Dir(CStr(a), vbDirectory) = "" Then '同名フォルダが存在しない場合のみ処理を行う
+                MkDir Path:=a   '新規フォルダを作成し、配列の値をフォルダ名に設定する
+            End If
+        End If
+    Next a
+        
+    ChDrive Bcdrive
+    ChDir Bcdir
+
+End Sub
